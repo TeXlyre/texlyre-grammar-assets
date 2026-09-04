@@ -1,0 +1,21 @@
+{
+  "name": "texlyre-grammar-assets",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Generated TextMate grammar assets for TeXlyre",
+  "license": "AGPL-3.0-or-later",
+  "type": "commonjs",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "build": "node scripts/download-grammars.cjs",
+    "build:optional": "node scripts/download-grammars.cjs --include-optional",
+    "generate:manifest": "node scripts/generate-grammar-manifest.cjs"
+  },
+  "dependencies": {
+    "fs-extra": "11.4.0",
+    "js-yaml": "5.2.2",
+    "jszip": "3.10.1"
+  }
+}

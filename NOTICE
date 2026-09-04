@@ -1,0 +1,9 @@
+TeXlyre Grammar Assets
+
+Generator scripts in this repository are adapted from TeXlyre v0.12.0:
+https://github.com/TeXlyre/texlyre/tree/v0.12.0/scripts
+
+TeXlyre is Copyright its contributors and licensed AGPL-3.0-or-later.
+This repository's original code is also licensed AGPL-3.0-or-later.
+
+Third-party grammar assets retain their respective upstream licenses. See THIRD_PARTY.md.

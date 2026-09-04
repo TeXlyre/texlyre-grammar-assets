@@ -1,0 +1,69 @@
+name: Release
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Install dependencies
+        run: npm install --ignore-scripts --no-audit --no-fund
+
+      - name: Build grammar assets
+        run: npm run build
+
+      - name: Create release archives
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          VERSION="$(node -p "require('./package.json').version")"
+          TAG="v${VERSION}"
+          ROOT="texlyre-grammar-assets-${VERSION}"
+
+          mkdir -p "release/${ROOT}"
+          cp -a dist/grammars/. "release/${ROOT}/"
+
+          find "release/${ROOT}" -exec touch -h -d '@0' {} +
+          tar --sort=name --mtime='@0' --owner=0 --group=0 --numeric-owner \
+            -C release -cf - "${ROOT}" | gzip -n > "release/${ROOT}.tar.gz"
+          (cd release && zip -X -q -r "${ROOT}.zip" "${ROOT}")
+          (cd release && sha256sum "${ROOT}.tar.gz" "${ROOT}.zip" > SHA256SUMS)
+
+          rm -rf "release/${ROOT}"
+
+          echo "VERSION=${VERSION}" >> "$GITHUB_ENV"
+          echo "TAG=${TAG}" >> "$GITHUB_ENV"
+
+      - name: Create tag
+        shell: bash
+        run: |
+          set -euo pipefail
+          git tag "$TAG"
+          git push origin "$TAG"
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh release create "$TAG" \
+            release/*.tar.gz release/*.zip release/SHA256SUMS \
+            --title "$TAG" \
+            --generate-notes
