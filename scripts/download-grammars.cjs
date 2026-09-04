@@ -152,8 +152,9 @@ function downloadFile(url) {
 }
 
 function convertYamlToJson(buffer) {
-  const parse = yaml.safeLoad ?? yaml.load;
-  return Buffer.from(JSON.stringify(parse(buffer.toString('utf8')), null, 1));
+  return Buffer.from(
+    JSON.stringify(yaml.load(buffer.toString('utf8')), null, 1)
+  );
 }
 
 async function writeAsset(dest, buffer, convert) {
