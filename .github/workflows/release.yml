@@ -24,36 +24,92 @@ jobs:
       - name: Install dependencies
         run: npm install --ignore-scripts --no-audit --no-fund
 
+      - name: Read version
+        shell: bash
+        run: |
+          VERSION="$(node -p "require('./package.json').version")"
+          echo "VERSION=${VERSION}" >> "$GITHUB_ENV"
+          echo "TAG=v${VERSION}" >> "$GITHUB_ENV"
+
       - name: Build grammar assets
         run: npm run build
 
-      - name: Create release archives
+      - name: Create standard archives
         shell: bash
         run: |
           set -euo pipefail
 
-          VERSION="$(node -p "require('./package.json').version")"
-          TAG="v${VERSION}"
           ROOT="texlyre-grammar-assets-${VERSION}"
 
           mkdir -p "release/${ROOT}"
           cp -a dist/grammars/. "release/${ROOT}/"
 
           find "release/${ROOT}" -exec touch -h -d '@0' {} +
-          tar --sort=name --mtime='@0' --owner=0 --group=0 --numeric-owner \
-            -C release -cf - "${ROOT}" | gzip -n > "release/${ROOT}.tar.gz"
-          (cd release && zip -X -q -r "${ROOT}.zip" "${ROOT}")
-          (cd release && sha256sum "${ROOT}.tar.gz" "${ROOT}.zip" > SHA256SUMS)
+
+          tar \
+            --sort=name \
+            --mtime='@0' \
+            --owner=0 \
+            --group=0 \
+            --numeric-owner \
+            -C release \
+            -cf - "${ROOT}" \
+            | gzip -n > "release/${ROOT}.tar.gz"
+
+          (
+            cd release
+            zip -X -q -r "${ROOT}.zip" "${ROOT}"
+          )
 
           rm -rf "release/${ROOT}"
 
-          echo "VERSION=${VERSION}" >> "$GITHUB_ENV"
-          echo "TAG=${TAG}" >> "$GITHUB_ENV"
+      - name: Build grammar assets with optional grammars
+        run: npm run build:optional
+
+      - name: Create optional archives
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          ROOT="texlyre-grammar-assets-${VERSION}-with-optional"
+
+          mkdir -p "release/${ROOT}"
+          cp -a dist/grammars/. "release/${ROOT}/"
+
+          find "release/${ROOT}" -exec touch -h -d '@0' {} +
+
+          tar \
+            --sort=name \
+            --mtime='@0' \
+            --owner=0 \
+            --group=0 \
+            --numeric-owner \
+            -C release \
+            -cf - "${ROOT}" \
+            | gzip -n > "release/${ROOT}.tar.gz"
+
+          (
+            cd release
+            zip -X -q -r "${ROOT}.zip" "${ROOT}"
+          )
+
+          rm -rf "release/${ROOT}"
+
+      - name: Create checksums
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          (
+            cd release
+            sha256sum *.tar.gz *.zip > SHA256SUMS
+          )
 
       - name: Create tag
         shell: bash
         run: |
           set -euo pipefail
+
           git tag "$TAG"
           git push origin "$TAG"
 
@@ -63,7 +119,10 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+
           gh release create "$TAG" \
-            release/*.tar.gz release/*.zip release/SHA256SUMS \
+            release/*.tar.gz \
+            release/*.zip \
+            release/SHA256SUMS \
             --title "$TAG" \
             --generate-notes
