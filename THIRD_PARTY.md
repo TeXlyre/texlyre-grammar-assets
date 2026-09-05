@@ -5,6 +5,7 @@ The release generator follows the source set used by TeXlyre v0.11.0.
 | Bundle | Upstream | License declared by TeXlyre downloader |
 |---|---|---|
 | SILE | `sile-typesetter/vscode-sile` | MIT |
+| Org | `vscode-org-mode/vscode-org-mode` | AGPL-3.0 |
 | PreTeXt | `PreTeXtBook/pretext-tools` | MIT |
 | ConTeXt | `pgundlach/context.tmbundle` | CC0-1.0 |
 | AsciiDoc | `asciidoctor/asciidoctor-vscode` | MIT |
