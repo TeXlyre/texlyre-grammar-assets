@@ -71,7 +71,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          ROOT="texlyre-grammar-assets-${VERSION}-with-optional"
+          ROOT="texlyre-grammar-assets-${VERSION}-include-optional"
 
           mkdir -p "release/${ROOT}"
           cp -a dist/grammars/. "release/${ROOT}/"
