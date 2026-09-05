@@ -41,6 +41,13 @@ const SOURCES = [
     ],
   },
   {
+		name: 'org', folder: 'org', license: 'GPL-3.0-or-later',
+		files: [
+			{ url: 'https://raw.githubusercontent.com/vscode-org-mode/vscode-org-mode/develop/syntaxes/org.tmLanguage.json', dest: 'org.tmLanguage.json' },
+			{ url: 'https://raw.githubusercontent.com/vscode-org-mode/vscode-org-mode/develop/LICENSE.txt', dest: 'LICENSE.txt' },
+		],
+	},
+  {
     name: 'pretext', folder: 'pretext', license: 'MIT',
     files: [
       { url: `${PRETEXT}/syntaxes/ptx.tmLanguage.json`, dest: 'ptx.tmLanguage.json' },
